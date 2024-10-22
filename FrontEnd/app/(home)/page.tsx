@@ -6,7 +6,6 @@ export default function Home() {
     <section className="flex flex-col  gap-4 py-4 md:py-5">
       <Hero/>
       <Dashboard/>
-
     </section>
   );
 }

@@ -6,20 +6,20 @@ import { Input } from "@nextui-org/input";
 import { Button } from "@nextui-org/button";
 import { createAccessToken, registerUser } from "@/services/Auth";
 import { useRouter } from "next/navigation";
+import { InfoIcon } from "../icons";
+import { Tooltip } from "@nextui-org/tooltip";
+import { Snippet } from "@nextui-org/snippet";
 
 export const AuthComponent = () => {
   const [activeTab, setActiveTab] = useState<string>("login");
   const [loading, setLoading] = useState(false);
-  //const router = useRouter();
-
-
+  const [authError, setAuthError] = useState<string | null>(null);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
-  
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
   const validateLogin = () => {
@@ -32,26 +32,28 @@ export const AuthComponent = () => {
 
   const handleLogin = async () => {
     if (validateLogin()) {
-        try {
-            setLoading(true);
-            const loginData = { username, password };
-            const result = await createAccessToken(loginData);
+      try {
+        setLoading(true);
+        const loginData = { username, password };
+        const result = await createAccessToken(loginData);
 
-            if (result === true) {
-                console.log("Login successful");
-                //router.push("/");
-                window.location.href = "/";
-                setLoading(false);
-            } else {
-                console.error("Login failed:", result);
-                setLoading(false);
-            }
-        } catch (error) {
-            console.error("Error during login:", error);
-            setLoading(false);
+        if (result === true) {
+          console.log("Login successful");
+          setAuthError("");
+          window.location.href = "/";
+          setLoading(false);
+        } else {
+          setAuthError("Login failed. Please check your credentials.");
+          console.error("Login failed:", result);
+          setLoading(false);
         }
+      } catch (error) {
+        setAuthError("An error occurred during login.");
+        console.error("Error during login:", error);
+        setLoading(false);
+      }
     }
-};
+  };
 
   const validateRegister = () => {
     const newErrors: { [key: string]: string } = {};
@@ -75,12 +77,15 @@ export const AuthComponent = () => {
 
         if (result === true) {
           console.log("Registration successful");
+          setAuthError("");
           await handleLogin();
         } else {
           console.error("Registration failed:", result);
+          setAuthError("Registration failed. Please try again.");
         }
       } catch (error) {
         console.error("Error during registration:", error);
+        setAuthError("An error occurred during registration.");
       } finally {
         setLoading(false);
       }
@@ -176,38 +181,62 @@ export const AuthComponent = () => {
           </Tab>
         </Tabs>
       </CardBody>
-      <CardFooter className="flex justify-end items-center gap-2">
-        {activeTab === "login" ? (
-          <>
-            <p>
-              Don't have an account?{" "}
-              <span
-                className="text-primary cursor-pointer"
-                onClick={() => setActiveTab("register")}
+      <CardFooter className="flex justify-end items-center flex-col gap-2">
+        {authError && (
+          <Tooltip
+            content={
+              <Snippet hideSymbol={true} hideCopyButton={true} className="bg-white" >
+                <span>Try default values... (already have data)</span>
+                <span>username: admin</span>
+                <span>password: 123qwe</span>
+              </Snippet>
+            }
+            placement="top-start"
+          >
+            <div className="alert alert-error flex items-center gap-2">
+              <InfoIcon color="red" />
+
+              <p className="text-red-500">{authError}</p>
+            </div>
+          </Tooltip>
+        )}
+        <div className="flex justify-end items-center gap-2">
+          {activeTab === "login" ? (
+            <>
+              <p>
+                Don't have an account?{" "}
+                <span
+                  className="text-primary cursor-pointer"
+                  onClick={() => setActiveTab("register")}
+                >
+                  Register
+                </span>
+              </p>
+              <Button color="primary" isLoading={loading} onClick={handleLogin}>
+                Authenticate
+              </Button>
+            </>
+          ) : (
+            <>
+              <p>
+                Already have an account?{" "}
+                <span
+                  className="text-primary cursor-pointer"
+                  onClick={() => setActiveTab("login")}
+                >
+                  Login
+                </span>
+              </p>
+              <Button
+                color="primary"
+                isLoading={loading}
+                onClick={handleRegister}
               >
                 Register
-              </span>
-            </p>
-            <Button color="primary" isLoading={loading}  onClick={handleLogin}>
-              Authenticate
-            </Button>
-          </>
-        ) : (
-          <>
-            <p>
-              Already have an account?{" "}
-              <span
-                className="text-primary cursor-pointer"
-                onClick={() => setActiveTab("login")}
-              >
-                Login
-              </span>
-            </p>
-            <Button color="primary" isLoading={loading}  onClick={handleRegister}>
-              Register
-            </Button>
-          </>
-        )}
+              </Button>
+            </>
+          )}
+        </div>
       </CardFooter>
     </Card>
   );

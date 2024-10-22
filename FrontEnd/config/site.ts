@@ -1,7 +1,7 @@
 export type SiteConfig = typeof siteConfig;
 
 export const siteConfig = {
-  name: "Ensolvers CHallenge",
+  name: "Notes App",
   description: "",
   navItems: [
   ],
