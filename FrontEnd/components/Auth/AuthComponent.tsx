@@ -185,7 +185,7 @@ export const AuthComponent = () => {
         {authError && (
           <Tooltip
             content={
-              <Snippet hideSymbol={true} hideCopyButton={true} className="bg-white" >
+              <Snippet hideSymbol={true} hideCopyButton={true} className="bg-white dark:bg-[#19191b] dark:text-white" >
                 <span>Try default values... (already have data)</span>
                 <span>username: admin</span>
                 <span>password: 123qwe</span>
@@ -197,6 +197,24 @@ export const AuthComponent = () => {
               <InfoIcon color="red" />
 
               <p className="text-red-500">{authError}</p>
+            </div>
+          </Tooltip>
+        )}
+        {!authError && (
+          <Tooltip
+            content={
+              <Snippet hideSymbol={true} hideCopyButton={true} className="bg-white dark:bg-[#19191b] dark:text-white" >
+                <span>Try... (already have data)</span>
+                <span>username: admin</span>
+                <span>password: 123qwe</span>
+              </Snippet>
+            }
+            placement="top"
+          >
+            <div className="alert alert-error flex items-center gap-2">
+              <InfoIcon color="black dark:white" />
+
+              <p className="text-black dark:text-white">try default values</p>
             </div>
           </Tooltip>
         )}
